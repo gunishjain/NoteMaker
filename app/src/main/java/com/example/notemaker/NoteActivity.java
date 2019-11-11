@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -13,9 +15,10 @@ import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.notemaker.Interface.noteRepository;
 import com.example.notemaker.models.note;
 
-public class NoteActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,View.OnClickListener
+public class NoteActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,View.OnClickListener, TextWatcher
 {
 
     private static final String TAG = "NoteActivity";
@@ -33,8 +36,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     // vars
     private boolean mIsNewNote;
     private note mNoteInitial;
+    private note mNoteFinal;
     private GestureDetector mGestureDetector;
     private int mMode;
+    private noteRepository mNoteRepository;
+
 
 
     @Override
@@ -48,6 +54,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mBackArrow = findViewById(R.id.toolbar_back_arrow);
         mCheckContainer = findViewById(R.id.check_container);
         mBackArrowContainer = findViewById(R.id.back_arrow_container);
+        mNoteRepository = new noteRepository(this);
 
         setListeners();
 
@@ -69,11 +76,13 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mCheck.setOnClickListener(this);
         mViewTitle.setOnClickListener(this);
         mBackArrow.setOnClickListener(this);
+        mEditTitle.addTextChangedListener(this);
     }
 
     private boolean getIncomingIntent(){
         if(getIntent().hasExtra("selected_note")){
             mNoteInitial = getIntent().getParcelableExtra("selected_note");
+            mNoteFinal = getIntent().getParcelableExtra("selected_note");
 
             mMode = EDIT_MODE_ENABLED;
             mIsNewNote = false;
@@ -82,6 +91,24 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mMode = EDIT_MODE_ENABLED;
         mIsNewNote = true;
         return true;
+    }
+
+
+
+    private void SavedChanges() {
+
+        if(mIsNewNote) {
+            saveNewNotes();
+
+        } else {
+
+        }
+    }
+
+    private void saveNewNotes() {
+        mNoteRepository.insertNoteTask(mNoteFinal);
+
+
     }
 
     private void disableContentInteraction(){
@@ -122,11 +149,33 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         mMode = EDIT_MODE_DISABLED;
 
         disableContentInteraction();
+
+        String temp= mLinedEditText.getText().toString();
+        temp = temp.replace("\n","");
+        temp = temp.replace(" ","");
+
+        if(temp.length()>0) {
+            mNoteFinal.setTitle(mLinedEditText.getText().toString());
+            mNoteFinal.setContent(mLinedEditText.getText().toString());
+            String timestamp = "Jan 2019";
+            mNoteFinal.setTimestamp(timestamp);
+
+            if(!mNoteFinal.getContent().equals(mNoteInitial.getContent())
+            || !mNoteFinal.getTitle().equals(mNoteInitial.getTitle())) {
+
+                SavedChanges();
+            }
+        }
+
     }
 
     private void setNewNoteProperties(){
         mViewTitle.setText("Note Title");
         mEditTitle.setText("Note Title");
+        mNoteInitial = new note();
+        mNoteFinal = new note();
+        mNoteInitial.setTitle("New Note");
+        mNoteFinal.setTitle("New Note");
     }
 
     private void setNoteProperties(){
@@ -230,6 +279,22 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         if(mMode == EDIT_MODE_ENABLED){
             enableEditMode();
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        mViewTitle.setText(s.toString());
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }
 
