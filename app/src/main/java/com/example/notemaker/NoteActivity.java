@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.example.notemaker.Interface.noteRepository;
 import com.example.notemaker.models.note;
+import com.example.notemaker.utils.Utility;
 
 public class NoteActivity extends AppCompatActivity implements View.OnTouchListener, GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener,View.OnClickListener, TextWatcher
 {
@@ -82,7 +83,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
     private boolean getIncomingIntent(){
         if(getIntent().hasExtra("selected_note")){
             mNoteInitial = getIntent().getParcelableExtra("selected_note");
-            mNoteFinal = getIntent().getParcelableExtra("selected_note");
+            mNoteFinal = new note();
+            mNoteFinal.setTitle(mNoteInitial.getTitle());
+            mNoteFinal.setContent(mNoteInitial.getContent());
+            mNoteFinal.setTimestamp(mNoteInitial.getTimestamp());
+            mNoteFinal.setId(mNoteInitial.getId());
 
             mMode = EDIT_MODE_ENABLED;
             mIsNewNote = false;
@@ -101,8 +106,14 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
             saveNewNotes();
 
         } else {
-
+          updateNotes();
         }
+    }
+
+
+    private void updateNotes() {
+
+        mNoteRepository.updateNotes(mNoteFinal);
     }
 
     private void saveNewNotes() {
@@ -157,7 +168,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnTouchListe
         if(temp.length()>0) {
             mNoteFinal.setTitle(mLinedEditText.getText().toString());
             mNoteFinal.setContent(mLinedEditText.getText().toString());
-            String timestamp = "Jan 2019";
+            String timestamp = Utility.getCurrentTimestamp();
             mNoteFinal.setTimestamp(timestamp);
 
             if(!mNoteFinal.getContent().equals(mNoteInitial.getContent())

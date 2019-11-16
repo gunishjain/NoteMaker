@@ -11,10 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.notemaker.R;
 import com.example.notemaker.models.note;
+import com.example.notemaker.utils.Utility;
 
 import java.util.ArrayList;
 
 public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.ViewHolder> {
+
 
     private static final String TAG = "NotesRecyclerAdapter";
 
@@ -37,8 +39,26 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
 
-        holder.timestamp.setText(mNotes.get(position).getTimestamp());
-        holder.title.setText(mNotes.get(position).getTitle());
+        try
+        {
+            String month= mNotes.get(position).getTimestamp().substring(0,2);
+            month= Utility.MonthfromNumber(month);
+
+            String year= mNotes.get(position).getTimestamp().substring(3);
+            String timeStamp = month + " " + year;
+
+
+            holder.timestamp.setText(timeStamp);
+            holder.title.setText(mNotes.get(position).getTitle());
+
+        } catch (NullPointerException e ) {
+            Log.e("NullPointer","NullPointerException :" + e.getMessage());
+
+
+
+        }
+
+
     }
 
     @Override

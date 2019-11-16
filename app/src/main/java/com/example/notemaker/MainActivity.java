@@ -1,6 +1,6 @@
 package com.example.notemaker;
 
-import androidx.appcompat.app.ActionBar;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 
-import android.util.Log;
+
 import android.view.View;
-import android.widget.LinearLayout;
+
 
 import com.example.notemaker.Adapters.NotesRecyclerAdapter;
 import com.example.notemaker.Interface.noteRepository;
@@ -115,6 +115,9 @@ public class MainActivity extends AppCompatActivity implements NotesRecyclerAdap
     private void deleteNote(note note) {
         mNotes.remove(note);
         mNoteRecyclerAdapter.notifyDataSetChanged();
+
+
+        mnoteRepository.DeleteNote(note);
     }
 
     ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
